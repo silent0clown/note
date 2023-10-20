@@ -28,14 +28,16 @@
  *  */ 
 
 
-ThreadPool* threadPoolCreate(int queueCapacity, int minNum, int maxNum){
-    ThreadPool* pool = (ThreadPool*)malloc(sizeof(ThreadPool));
+ThreadPool_t* threadPoolCreate(int queueCapacity, int minNum, int maxNum){
+    ThreadPool_t* pool = (ThreadPool_t*)malloc(sizeof(ThreadPool_t));
+    // 替换goto的方法，一般使用do...while(0)
     if(pool == NULL){
         printf("malloc threadpool fail....\n");
         goto failure;
     }
 
-    pool->threadIDs = (pthread_t*)malloc(sizeof(pthread_t) * maxNum);
+    // 给工作线程数组申请内存
+    pool->threadIDs = (pthread_t* )malloc(sizeof(pthread_t) * maxNum);
     if(pool->threadIDs == NULL){
         printf("malloc threadIDs fail...\n");
         goto failure;
@@ -49,16 +51,16 @@ ThreadPool* threadPoolCreate(int queueCapacity, int minNum, int maxNum){
 
     if(pthread_mutex_init(&pool->mutexPool, NULL) != 0 ||
        pthread_mutex_init(&pool->mutexBusy, NULL) != 0 ||
-       pthread_mutex_init(&pool->notEmpty, NULL) != 0 ||
-       pthread_mutex_init(&pool->notFull, NULL) != 0) 
+       pthread_cond_init(&pool->notEmpty, NULL) != 0 ||
+       pthread_cond_init(&pool->notFull, NULL) != 0) 
     {
         printf("mutex or condition init fail...\n");
         
-        return 0;
+        goto failure;
     }
 
     // 任务队列
-    pool->taskQ = malloc(sizeof(thread_task) * queueCapacity);
+    pool->taskQ = malloc(sizeof(ThreadTask_t) * queueCapacity);
     if(pool->taskQ == NULL)
     {
         printf("malloc task fail...\n");
@@ -86,4 +88,60 @@ if(pool->threadIDs) free(pool->threadIDs);
 if(pool->taskQ) free(pool->taskQ);
 if(pool) free(pool);
 return NULL;
+}
+
+// 工作线程
+void* ThreadPoolTaskThread(void* threadpool)
+{
+    ThreadPool_t* pool = (ThreadPool_t* )threadpool;
+    ThreadTask_t  task;
+
+    while(1)
+    {
+        pthread_mutex_lock(&pool->mutexPool);
+
+        /* 无任务阻塞在“任务队列不为空”上，有任务则跳出 */
+        while((pool->queueSize == 0) && !(pool->shutdown))
+        {
+            printf("thread 0x%x is waiting \n", (unsigned int)pthread_self());
+            pthread_cond_wait(&(pool->notEmpty), &(pool->mutexPool));
+        
+            /* 判断是否需要清除线程，自杀功能 */
+            if(pool->exitNum > 0)
+            {
+                pool->exitNum--;
+            }
+
+            /* 判断线程池中的线程数是否大于最小线程数，是则结束当前线程 */
+            if(pool->liveNum > pool->minNum)
+            {
+                printf("thread 0x%x is exiting \n", (unsigned int)pthread_self());
+                pool->liveNum--;
+                pthread_mutex_unlock(&(pool->mutexPool));
+                pthread_exit(NULL); // 结束线程
+            }
+        }
+    }
+
+    /* 线程池开关状态 */
+    if(pool->shutdown)    // 销毁线程池
+    {
+        pthread_mutex_unlock(&(pool->mutexPool));
+        printf("thread 0x%x is exiting \n", (unsigned int)pthread_self());
+        pthread_exit(NULL);       // 结束线程
+    }
+
+    /* 该线程可以拿出任务 */
+    task.function = pool->taskQ[pool->queueFront].function;   // 队首出队操作
+    task.arg      = pool->taskQ[pool->queueFront].arg;
+
+    pool->queueFront = (pool->queueFront + 1) % pool->queueCapacity;   // 环形队列
+    pool->queueSize--; 
+
+    /* 通知可以添加新任务 */
+    pthread_cond_broadcast(&(pool->notEmpty));
+
+    /* 释放线程锁 */
+    pthread_mutex_unlock(&(pool->mutexPool));
+
 }
