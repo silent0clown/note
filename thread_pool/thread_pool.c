@@ -121,27 +121,77 @@ void* ThreadPoolTaskThread(void* threadpool)
                 pthread_exit(NULL); // 结束线程
             }
         }
+
+
+        /* 线程池开关状态 */
+        if(pool->shutdown)    // 销毁线程池
+        {
+            pthread_mutex_unlock(&(pool->mutexPool));
+            printf("thread 0x%x is exiting \n", (unsigned int)pthread_self());
+            pthread_exit(NULL);       // 结束线程
+        }
+
+        /* 该线程可以拿出任务 */
+        task.function = pool->taskQ[pool->queueFront].function;   // 队首出队操作
+        task.arg      = pool->taskQ[pool->queueFront].arg;
+
+        pool->queueFront = (pool->queueFront + 1) % pool->queueCapacity;   // 环形队列
+        pool->queueSize--; 
+
+        /* 通知可以添加新任务 */
+        pthread_cond_broadcast(&(pool->notEmpty));
+
+        /* 释放线程锁 */
+        pthread_mutex_unlock(&(pool->mutexPool));
+
+        /* 执行刚才取出的任务 */
+        printf("thread 0x%x start working \n", (unsigned int)pthread_self());
+        pthread_mutex_lock(pool->busyNum);
+        pool->busyNum++;
+        pthread_mutex_unlock(pool->busyNum);
+
+        /* 执行任务 */
+        (*(task.function))(task.arg);
+
+        /* 任务结束处理 */           
+        printf("thread 0x%x end working \n", (unsigned int)pthread_self());
+        pthread_mutex_lock(pool->busyNum);
+        pool->busyNum--;
+        pthread_mutex_unlock(pool->busyNum);
     }
 
-    /* 线程池开关状态 */
-    if(pool->shutdown)    // 销毁线程池
+    pthread_exit(NULL);
+}
+
+/* 向线程池的任务队列中添加一个任务 */
+int ThreadPoolAddTask(ThreadPool_t* pool, void *(*function)(void *arg), void *arg)
+{
+    pthread_mutex_lock(&(pool->mutexPool));
+
+    /* 如果队列满了，调用wait阻塞 */
+    while((pool->queueSize == pool->maxNum) && !(pool->shutdown))
+    {
+        pthread_cond_wait(&(pool->notFull), &(pool->mutexPool));
+    }
+
+    /* 如果线程池处于关闭状态 */
+    if(pool->shutdown)
     {
         pthread_mutex_unlock(&(pool->mutexPool));
-        printf("thread 0x%x is exiting \n", (unsigned int)pthread_self());
-        pthread_exit(NULL);       // 结束线程
+        
+        return -1;
     }
 
-    /* 该线程可以拿出任务 */
-    task.function = pool->taskQ[pool->queueFront].function;   // 队首出队操作
-    task.arg      = pool->taskQ[pool->queueFront].arg;
+    /* 清空工作线程的回调函数参数arg */
+    if(pool->taskQ[pool->queueRear].arg != NULL)
+    {
+        free(pool->taskQ[pool->queueRear].arg);
+        pool->taskQ[pool->queueRear].arg = NULL;
+    }
 
-    pool->queueFront = (pool->queueFront + 1) % pool->queueCapacity;   // 环形队列
-    pool->queueSize--; 
-
-    /* 通知可以添加新任务 */
-    pthread_cond_broadcast(&(pool->notEmpty));
-
-    /* 释放线程锁 */
-    pthread_mutex_unlock(&(pool->mutexPool));
+    /* 添加任务到任务队列 */
+    pool->taskQ[pool->queueRear].function = function;
+    pool->taskQ[pool->queueRear].arg      = arg;
+    pool->queueRear  = (pool->queueRear + 1) % pool->queueCapacity;  /* 逻辑环 */
 
 }
