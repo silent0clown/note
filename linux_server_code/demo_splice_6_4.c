@@ -44,6 +44,8 @@ int main(int argc, char *argv[]) {
         assert(ret != -1);
         ret = pipe(pipefd);          /* 创建管道 */
         /* 将connfd上流入的客户数据定向到管道中 */
+        /* 通过splice函数将客户端的内容读入到pipefd[1]中，然后再使用splice函数从pipefd[0]中读出该内容到客户端 */
+        /* 从而实现简单高效的回射服务。整个过程未执行recv/send操作，未涉及用户空间和内核空间的数据拷贝 */
         ret = splice(connfd, NULL, pipefd[1], NULL, 32768, SPLICE_F_MORE|SPLICE_F_MOVE);
         assert(ret != -1);
         /* 将管道的输出定向到connfd客户连接文件描述符 */
