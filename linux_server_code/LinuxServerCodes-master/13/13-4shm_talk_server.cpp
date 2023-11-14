@@ -1,6 +1,9 @@
 // 多进程服务器
 /* 一个子进程处理一个客户连接，同时将所有客户socket连接的读缓冲设计为一块共享内存 */
 
+
+/* 每个子进程只往自己处理的客户连接所对应的那一部分读缓存中写入数据，所以共享内存只是为了“共享读”。因此，每个子进程在使用共享内存的时候无须加锁 */
+/* 程序在启动时给数组users分配了足够多的空间，使得它可以存储所有可能的客户连接的相关数据。同样一次性给数组sub_process分配的空间也足以存储所有可能的子进程的相关数据 */
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -26,10 +29,10 @@
 
 struct client_data
 {
-    sockaddr_in address;
-    int connfd;
-    pid_t pid;
-    int pipefd[2];
+    sockaddr_in address;     // 客户端socket地址
+    int connfd;              // socket文件描述符
+    pid_t pid;               // 处理这个连接子进程的PID
+    int pipefd[2];           // 和父进程通信用的管道
 };
 
 static const char* shm_name = "/my_shm";
@@ -38,9 +41,9 @@ int epollfd;
 int listenfd;
 int shmfd;
 char* share_mem = 0;
-client_data* users = 0;
-int* sub_process = 0;
-int user_count = 0;
+client_data* users = 0;      // 客户连接数组，进程用客户连接的编号来索引这个数组，即可获得相关的客户连接的编号
+int* sub_process = 0;        // 子进程和客户连接的映射关系表，用进程的PID来索引这个数组，即可取得该进程所处理的客户连接的编号
+int user_count = 0;          // 当前客户数量
 bool stop_child = false;
 
 int setnonblocking( int fd )
@@ -92,14 +95,21 @@ void del_resource()
     delete [] sub_process;
 }
 
+// 停止一个子进程
 void child_term_handler( int sig )
 {
     stop_child = true;
 }
 
+/* 子进程运行的函数
+ * idx       : 子进程处理的客户连接的编号
+ * users     : 保存所有客户连接数据的数组
+ * share_mem : 共享内存起始地址
+ */
 int run_child( int idx, client_data* users, char* share_mem )
 {
     epoll_event events[ MAX_EVENT_NUMBER ];
+    // 子进程使用I/O复用同时监听两个文件描述符：客户连接socket、与父进程通信的管道文件描述符
     int child_epollfd = epoll_create( 5 );
     assert( child_epollfd != -1 );
     int connfd = users[idx].connfd;
@@ -107,6 +117,7 @@ int run_child( int idx, client_data* users, char* share_mem )
     int pipefd = users[idx].pipefd[1];
     addfd( child_epollfd, pipefd );
     int ret;
+    // 子进程需要设置自己的信号处理函数
     addsig( SIGTERM, child_term_handler, false );
 
     while( !stop_child )
@@ -121,9 +132,13 @@ int run_child( int idx, client_data* users, char* share_mem )
         for ( int i = 0; i < number; i++ )
         {
             int sockfd = events[i].data.fd;
+            // 本子进程负责的客户连接有数据到达
             if( ( sockfd == connfd ) && ( events[i].events & EPOLLIN ) )
             {
                 memset( share_mem + idx*BUFFER_SIZE, '\0', BUFFER_SIZE );
+                // 将客户数据读取到对应的读缓存中。该读缓存是共享内存的一段。
+                // 它开始于idx*BUFFER_SIZE处，长度为BUFFER_SIZE。
+                // 各个客户连接的读缓存是共享的
                 ret = recv( connfd, share_mem + idx*BUFFER_SIZE, BUFFER_SIZE-1, 0 );
                 if( ret < 0 )
                 {
@@ -138,9 +153,11 @@ int run_child( int idx, client_data* users, char* share_mem )
                 }
                 else
                 {
+                    // 成功读取客户数据后就通知主进程（通过管道）来处理。
                     send( pipefd, ( char* )&idx, sizeof( idx ), 0 );
                 }
             }
+            // 主进程通知本进程（通过管道）将第client个客户的数据发送到本进程负责的客户端
             else if( ( sockfd == pipefd ) && ( events[i].events & EPOLLIN ) )
             {
                 int client = 0;
@@ -225,6 +242,7 @@ int main( int argc, char* argv[] )
     bool stop_server = false;
     bool terminate = false;
 
+    // 创建共享内存，作为所有客户socket连接的读缓存
     shmfd = shm_open( shm_name, O_CREAT | O_RDWR, 0666 );
     assert( shmfd != -1 );
     ret = ftruncate( shmfd, USER_LIMIT * BUFFER_SIZE ); 
@@ -246,6 +264,7 @@ int main( int argc, char* argv[] )
         for ( int i = 0; i < number; i++ )
         {
             int sockfd = events[i].data.fd;
+            // 新的客户连接到带来
             if( sockfd == listenfd )
             {
                 struct sockaddr_in client_address;
@@ -264,8 +283,12 @@ int main( int argc, char* argv[] )
                     close( connfd );
                     continue;
                 }
+                
+                // 保存第user_count个客户连接的相关数据
                 users[user_count].address = client_address;
                 users[user_count].connfd = connfd;
+
+                // 在主进程和子进程间建立管道，以传递必要的数据
                 ret = socketpair( PF_UNIX, SOCK_STREAM, 0, users[user_count].pipefd );
                 assert( ret != -1 );
                 pid_t pid = fork();
@@ -274,6 +297,7 @@ int main( int argc, char* argv[] )
                     close( connfd );
                     continue;
                 }
+                // 子进程
                 else if( pid == 0 )
                 {
                     close( epollfd );
@@ -285,6 +309,7 @@ int main( int argc, char* argv[] )
                     munmap( (void*)share_mem,  USER_LIMIT * BUFFER_SIZE );
                     exit( 0 );
                 }
+                // 父进程
                 else
                 {
                     close( connfd );
@@ -295,6 +320,7 @@ int main( int argc, char* argv[] )
                     user_count++;
                 }
             }
+            // 处理信号事件
             else if( ( sockfd == sig_pipefd[0] ) && ( events[i].events & EPOLLIN ) )
             {
                 int sig;
@@ -314,34 +340,37 @@ int main( int argc, char* argv[] )
                     {
                         switch( signals[i] )
                         {
+                            // 子进程退出，表示有某个客户端关闭了连接
                             case SIGCHLD:
                             {
-	                        pid_t pid;
-	                        int stat;
-	                        while ( ( pid = waitpid( -1, &stat, WNOHANG ) ) > 0 )
-                                {
-                                    int del_user = sub_process[pid];
-                                    sub_process[pid] = -1;
-                                    if( ( del_user < 0 ) || ( del_user > USER_LIMIT ) )
+                                pid_t pid;
+                                int stat;
+                                while ( ( pid = waitpid( -1, &stat, WNOHANG ) ) > 0 )
                                     {
-                                        printf( "the deleted user was not change\n" );
-                                        continue;
+                                        int del_user = sub_process[pid];
+                                        sub_process[pid] = -1;
+                                        if( ( del_user < 0 ) || ( del_user > USER_LIMIT ) )
+                                        {
+                                            printf( "the deleted user was not change\n" );
+                                            continue;
+                                        }
+                                        // 清除第del_user个客户连接使用的相关数据
+                                        epoll_ctl( epollfd, EPOLL_CTL_DEL, users[del_user].pipefd[0], 0 );
+                                        close( users[del_user].pipefd[0] );
+                                        users[del_user] = users[--user_count];
+                                        sub_process[users[del_user].pid] = del_user;
+                                        printf( "child %d exit, now we have %d users\n", del_user, user_count ); 
                                     }
-                                    epoll_ctl( epollfd, EPOLL_CTL_DEL, users[del_user].pipefd[0], 0 );
-                                    close( users[del_user].pipefd[0] );
-                                    users[del_user] = users[--user_count];
-                                    sub_process[users[del_user].pid] = del_user;
-                                    printf( "child %d exit, now we have %d users\n", del_user, user_count ); 
-                                }
-                                if( terminate && user_count == 0 )
-                                {
-                                    stop_server = true;
-                                }
-                                break;
+                                    if( terminate && user_count == 0 )
+                                    {
+                                        stop_server = true;
+                                    }
+                                    break;
                             }
                             case SIGTERM:
                             case SIGINT:
                             {
+                                // 结束服务器程序
                                 printf( "kill all the clild now\n" );
                                 //addsig( SIGTERM, SIG_IGN );
                                 //addsig( SIGINT, SIG_IGN );
@@ -366,9 +395,12 @@ int main( int argc, char* argv[] )
                     }
                 }
             }
+            
+            // 某个子进程向父进程写入了数据
             else if( events[i].events & EPOLLIN )
             {
                 int child = 0;
+                // 读取管道数据，child变量记录了是哪个客户连接有到达数据
                 ret = recv( sockfd, ( char* )&child, sizeof( child ), 0 );
                 printf( "read data from child accross pipe\n" );
                 if( ret == -1 )
@@ -381,6 +413,7 @@ int main( int argc, char* argv[] )
                 }
                 else
                 {
+                    // 向除负责处理第child个客户连接的子进程之外的其他子进程发送消息，通知他们有客户数据要写
                     for( int j = 0; j < user_count; ++j )
                     {
                         if( users[j].pipefd[0] != sockfd )
