@@ -53,3 +53,21 @@ curl_easy_cleanup()
 8. **[CURLOPT_READFUNCTION](https://curl.se/libcurl/c/CURLOPT_READFUNCTION.html)**，用于上传文件
 9. **[CURLOPT_URL](https://curl.se/libcurl/c/CURLOPT_URL.html)**
 10. CURLOPT_PROXY
+11. CURLINFO_CONTENT_LENGTH_DOWNLOAD 使用该选项时要求传递一个 double 型指针到函数中，该 double 型变量用来存放所要下载文件(或者是所要查询的文件)的 content-length (文档长度) 的信息。如果文件大小无法获取，那么函数返回值为 -1 
+
+# 手把手实现多线程下载以及断点续传
+1. download第三方库选择
+2. curl与自实现http请求
+3. mmap共享内存的使用
+4. wmem/rmem的优化
+5. 多线程下载httphdr的range使用
+6. 断点续传实现
+7. md5与sha256校验值
+
+
+# 编译
+需提前安装curl库
+
+```bash
+gcc main.c -o proc_main libcurl
+```
