@@ -24,8 +24,8 @@ int main()
 
 // display information on screen with cout
 
-    cout << fixed;
-    cout.precision(2);
+    cout << fixed;       // 以普通方式输出，非科学计数法
+    cout.precision(2);   // 保留小数点两位
     cout.setf(ios_base::showpoint);
     cout << "Make and model: " << automobile << endl;
     cout << "Year: " << year << endl;
