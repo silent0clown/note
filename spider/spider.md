@@ -73,6 +73,7 @@
    ```
 5. sudo apt-get install -y  tesseract-ocr libtesseract-dev libleptonica-dev
    - 这个方案步骤7会出错，[解决方法](https://cloud.tencent.com/developer/article/1740618)
+   - https://codeantenna.com/a/H3LiLTOeTF
    
 6. 下载tesseract的语言包：
    - git clone git@github.com:tesseract-ocr/tessdata.git
@@ -80,7 +81,12 @@
    - 查看语言包命令： tesseract --list-langs
 
 7. 安装tesserocr : pip install tesserocr pillow 
+    ```bash
+    测试按照是否成功：
+    1. 保存图片：https://raw.githubusercontent.com/Python3WebSpider/TestTess/master/image.png 
+    2. 
 
+    ```
 8. 安装数据库
    apt-get install -y mysql-server mysql-client
 

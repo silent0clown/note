@@ -1,9 +1,22 @@
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 # test plantomJS
-from selenium import webdriver
-browser = webdriver.PhantomJS()
-browser.get("http://www.baidu.com")
-print(browser.current_url)
+# from selenium import webdriver
+# browser = webdriver.PhantomJS()
+# browser.get("http://www.baidu.com")
+# print(browser.current_url)
+
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+# test tesserocr
+# import tesserocr
+# from PIL import Image
+# image = Image.open('image.png')
+# print(tesserocr.image_to_text(image))
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+import urllib.request
+response = urllib.request.urlopen('https://www.python.org')
+print(response.read().decode('utf-8'))
 
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
