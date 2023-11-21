@@ -1,3 +1,6 @@
+headers_table = {
+    'User-Agent': 'Mozilla/4.0 (compatible; MSIZE 5.5; Windows NT)'
+}
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 # test plantomJS
 # from selenium import webdriver
@@ -13,11 +16,43 @@
 # image = Image.open('image.png')
 # print(tesserocr.image_to_text(image))
 
-##    ----------------------------------------- splite line -----------------------------------------       ##
-import urllib.request
-response = urllib.request.urlopen('https://www.python.org')
-print(response.read().decode('utf-8'))
 
+
+# URL urllib
+##    ----------------------------------------- splite line -----------------------------------------       ##
+# import urllib.request
+# response = urllib.request.urlopen('https://www.zhihu.com')
+# # print(response.read().decode('utf-8'))
+# print(type(response))
+# print(response.status)
+# print(response.getheaders())
+# print(response.getheader('Server'))
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+# import urllib.parse
+# import urllib.request
+# import socket
+# import urllib.error
+
+# data = bytes(urllib.parse.urlencode({'word': 'hello'}), encoding='utf8')
+# try:
+#     response = urllib.request.urlopen('http://httpbin.org/post', data=data, timeout=1)
+#     print(response.read())
+# except urllib.error.URLError as e:
+#     if isinstance(e.reason, socket.timeout):
+#         print("TIME OUT")
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+# import urllib.request, urllib.parse
+
+# url_info = 'http://httpbin.org/post'
+# dict = {
+#     'name':'Germey'
+# }
+# data_info = bytes(urllib.parse.urlencode(dict), encoding='utf-8')
+# request = urllib.request.Request(url = url_info, data = data_info, headers = headers_table)
+# response = urllib.request.urlopen(request)
+# print(response.read().decode('utf-8'))
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 3.2.4 POST请求
@@ -26,14 +61,266 @@ print(response.read().decode('utf-8'))
 # r = requests.post("http://httpbin.org/post", data=data)
 # print(r.text)
 
+##    ----------------------------------------- splite line -----------------------------------------       ##
+## 验证
+## 这种方法不可以登录知乎
+# from urllib.request import HTTPPasswordMgrWithDefaultRealm, HTTPBasicAuthHandler, build_opener
+# from urllib.error import URLError
+
+# username = ''
+# password = ''
+# url = 'https://www.zhihu.com/signin?next=%2Fhot'
+
+# p = HTTPPasswordMgrWithDefaultRealm()
+# p.add_password(None, url, username, password)
+# auth_handler = HTTPBasicAuthHandler(p)
+# opener = build_opener(auth_handler)
+
+# try:
+#     result = opener.open(url)
+#     html = result.read().decode('utf-8')
+#     print(html)
+# except URLError as e:
+#     print(e.reason)
 
 
 
+##    ----------------------------------------- splite line -----------------------------------------       ##
+## 代理
+# from urllib.error import URLError
+# from urllib.request import ProxyHandler, build_opener
+
+# proxy_handler = ProxyHandler({
+#     'http': 'http://127.0.0.1:9743',
+#     'https': 'https://127.0.0.1:9743'
+# })
+# opener = build_opener(proxy_handler)
+# try:
+#     response = opener.open('https://www.baidu.com')
+#     print(response.read().decode('utf-8'))
+# except URLError as e:
+#     print(e.reason)
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+## Cookies
+# import http.cookiejar, urllib.request
+
+# cookie = http.cookiejar.CookieJar()
+# handler = urllib.request.HTTPCookieProcessor(cookie)
+# opener = urllib.request.build_opener(handler)
+# response = opener.open('http://www.baidu.com')
+# for item in cookie:
+#     print(item.name+"="+item.value)
+
+##    ----------------------------------------- splite line -----------------------------------------       ##
+# URLERROR
+# from urllib import request, error
+# try:
+#     response = request.urlopen('http://cuiqingcai.com/index.htm')
+# except error.URLError as e:
+#     print(e.reason)
+
+
+##    ---------------------------------------- 3.1.3解析链接 -----------------------------------------       ##
+# from urllib.parse import urlparse
+
+# result = urlparse('http://www.baidu.com/index.html;user?id=5#comment')
+# print(type(result), result)
+# # 必须得带http才行
+# # <class 'urllib.parse.ParseResult'> ParseResult(scheme='www.baidu.com', netloc='', path='8080/index.html;user', params='', query='id=5', fragment='comment')
+
+# result = urlparse('www.baidu.com:8080/index.html;user?id=5#comment')
+# print(type(result), result)
+# result = urlparse('www.baidu.com/index.html;user?id=5#comment', scheme= 'https')
+# print(type(result), result)
+# result = urlparse('www.baidu.com/index.html;user?id=5#comment', allow_fragments=False)
+# print(type(result), result)
+
+#### urlunparse()
+# from urllib.parse import urlunparse
+# data = ['http', 'www.baidu.com', 'index.html', 'user', 'a=6', 'comment']
+# print(urlunparse(data))
+
+
+#### urlsplit
+# from urllib.parse import urlsplit
+
+# result = urlsplit('http://www.baidu.com/index.html;user?id=5#comment')
+# print(result)
+# print(result[1])
+# print(result[8])
+
+#### urlunsplit
+# from urllib.parse import urlunsplit
+
+# data = ['http', 'www.baidu.com', 'index.html', 'a=6', 'comment']
+# print(urlunsplit(data))
+
+
+#### urljoin()
+# from urllib.parse import urljoin
+
+# print(urljoin('http://www.baidu.com', 'FAQ.html'))
+# print(urljoin('http://www.baidu.com', 'https://cuiqingcai.com/FAQ.html'))
+# print(urljoin('http://www.baidu.com/about.html', 'https://cuiqingcai.com/FAQ.html'))
+# print(urljoin('http://www.baidu.com/about.html', 'https://cuiqingcai.com/FAQ.html?question=2'))
+# print(urljoin('http://www.baidu.com?wd=abc', 'https://cuiqingcai.com/index.php'))
+# print(urljoin('http://www.baidu.com', '?category=2#comment'))
+# print(urljoin('www.baidu.com', '?category=2#comment'))
+# print(urljoin('www.baidu.com#comment', '?category=2'))
+
+
+#### urlencode
+# from urllib.parse import urlencode
+
+# params = {
+#     'name': 'germey',
+#     'age': 22
+# }
+# base_url = 'http://www.baidu.com?'
+# url = base_url + urlencode(params)
+# print(url)
+
+
+#### 反序列化 
+# from urllib.parse import parse_qs
+
+# query = 'name=germey&age=22'
+# print(parse_qs(query))
+
+# from urllib.parse import parse_qsl
+
+# query = 'name=germey&age=22'
+# print(parse_qsl(query))
+
+
+#### 中文搜索乱码，将中文字符转化为URL编码
+# from urllib.parse import quote
+
+# keyword = '壁纸'
+# url = 'https://www.baidu.com/s?wd=' + quote(keyword)
+# print(url)
+
+#### 解码
+# from urllib.parse import unquote
+
+# url = 'https://www.baidu.com/s?wd=%E5%A3%81%E7%BA%B8'
+# print(unquote(url))
 
 
 
+##    ----------------------------------------- 3.2 使用requests -----------------------------------------       ##
+# import requests
+
+# r = requests.get('https://www.baidu.com/')
+# print(type(r))
+# print(r.status_code)
+# print(type(r.text))
+# print(r.text)
+# print(r.cookies)
+
+# r = requests.post('http://httpbin.org/post')
+# r = requests.put('http://httpbin.org/put')
+# r = requests.delete('http://httpbin.org/delete')
+# r = requests.head('http://httpbin.org/get')
+# r = requests.options('http://httpbin.org/get')
+
+# import requests
+
+# data = {
+#     'name': 'germey',
+#     'age': 22
+# }
+# r = requests.get("http://httpbin.org/get", params=data)
+# print(r.text)
 
 
+# import requests
+# import re
+
+# headers = {
+#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+# }
+# r = requests.get("https://www.zhihu.com/explore", headers=headers)
+# pattern = re.compile('explore-feed.*?question_link.*?>(.*?)</a>', re.S)
+# titles = re.findall(pattern, r.text)
+# print(titles)
+
+
+
+# 抓取图片音视频
+# import requests
+# import re
+# headers = {
+#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
+# }
+# r = requests.get('https://www.zhihu.com/favicon.ico', headers=headers) 
+# with open('zhihu.ico', 'wb') as f:
+#     f.write(r.content)
+# r = requests.get('https://www.baidu.com/favicon.ico', headers=headers) 
+# with open('baidu.ico', 'wb') as f:
+#     f.write(r.content)
+
+# r = requests.get("https://www.zhihu.com/explore")
+# pattern = re.compile('explore-feed.*?question_link.*?>(.*?)</a>', re.S)
+# titles = re.findall(pattern, r.text)
+# print(r.text)
+# print(titles)
+
+
+# import requests
+
+# cookies = 'KLBRSID=46a537df17633233e0a02eea70ad140c|1700473799|1700473799'
+# jar = requests.cookies.RequestsCookieJar()
+# headers = {
+#     'Host': 'www.zhihu.com',
+#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'
+# }
+# for cookie in cookies.split(';'):
+#     key, value = cookie.split('=', 1)
+#     jar.set(key, value)
+# r = requests.get('http://www.zhihu.com', cookies=jar, headers=headers)
+# print(r.text)
+
+# import requests
+
+# requests.get('http://httpbin.org/cookies/set/number/123456789')
+# r = requests.get('http://httpbin.org/cookies')
+# print(r.text)
+
+# import requests
+
+# s = requests.Session()
+# s.get('http://httpbin.org/cookies/set/number/123456789')
+# r = s.get('http://httpbin.org/cookies')
+# print(r.text)
+
+# import requests
+
+# response = requests.get('https://www.12306.cn', verify=True)
+# print(response.status_code)
+
+# print("spilet------")
+# response = requests.get('https://www.12306.cn', verify=False)
+# print(response.status_code)
+
+
+##    ----------------------------------------- 3.3 正则表达式 -----------------------------------------       ##
+# import re
+
+# content = 'Hello 123 4567 World_This is a Regex Demo'
+# print(len(content))
+# result = re.match('^Hello\s\d\d\d\s\d{4}\s\w{10}', content)
+# print(result)
+# print(result.group())
+# print(result.span())
+##    ----------------------------------------- splite line -----------------------------------------       ##
+
+# from urllib import request,error
+# try:
+#     response = request.urlopen('http://cuiqingcai.com/index.htm')
+# except error.HTTPError as e:
+#     print(e.reason, e.code, e.headers, sep='\n')
 
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
@@ -42,7 +329,7 @@ print(response.read().decode('utf-8'))
 # headers = {
 #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
 # }
-# r = requests.get('https://www.zhihu.com/favicon.ico', headers=headers) 
+# r = requests.get('https://www.baidu.com/favicon.ico', headers=headers) 
 # with open('zhihu.ico', 'wb') as f:
 #     f.write(r.content)
 
@@ -487,65 +774,61 @@ print(response.read().decode('utf-8'))
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 3.4 抓取猫眼电影排行TOP100
-# import requests
-# import re
 # import json
+# import requests
+# from requests.exceptions import RequestException
+# import re
 # import time
 
-# def get_one_page(url):
-#     headers = {
+# headers = {
 #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
-#     }
+# }
 
-#     response = requests.get(url, headers=headers)
-#     if response.status_code == 200:
-#         return response.text
-#     return None
+# def get_one_page(url):
+#     try:
+#         response = requests.get(url,headers=headers)
+#         if response.status_code == 200:
+#             print(response.text)
+#             return response.text
+
+#         return None
+#     except RequestException:
+#         return None
+
 
 # def parse_one_page(html):
-#     # number          <dd>.*?board-index.*?>(.*?)</i>
-#     # file picture    <dd>.*?board-index.*?>(.*?)</i>.*?data-src="(.*?)"
-#     # file name       <dd>.*?board-index.*?>(.*?)</i>.*?data-src="(.*?)".*?name.*?a.*?>(.*?)</a>
-#     # file name       <dd>.*?board-index.*?>(.*?)</i>.*?data-src="(.*?)".*?name.*?a.*?>(.*?)</a>.*?star.*?>(.*?)</p>.*?releasetime.*?>(.*?)</p>.*?integer.*?>(.*?)</i>.*?fraction.*?>(.*?)</i>.*?</dd>
-
-#     pattern = re.compile('<dd>.*?board-index.*?>(.*?)</i>.*?data-src="(.*?)".*?name.*?a.*?>(.*?)</a>.*?star.*?>(.*?)</p>.*?releasetime.*?>(.*?)</p>.*?integer.*?>(.*?)</i>.*?fraction.*?>(.*?)</i>.*?</dd>',re.S)
-#     # items = re.findall('<dd>.*?board-index.*?>(.*?)</i>', html, re.S)
+#     pattern = re.compile('<dd>.*?board-index.*?>(\d+)</i>.*?data-src="(.*?)".*?name"><a'
+#                          + '.*?>(.*?)</a>.*?star">(.*?)</p>.*?releasetime">(.*?)</p>'
+#                          + '.*?integer">(.*?)</i>.*?fraction">(.*?)</i>.*?</dd>', re.S)
 #     items = re.findall(pattern, html)
 #     for item in items:
-#         yield{
+#         yield {
 #             'index': item[0],
 #             'image': item[1],
-#             'title': item[2].strip(),
-#             'actor': item[3].strip()[3:] if len(item[3]) > 3 else '',
-#             'time':  item[4].strip()[5:] if len(item[4]) > 5 else '',
-#             'score': item[5].strip() + item[6].strip()
+#             'title': item[2],
+#             'actor': item[3].strip()[3:],
+#             'time': item[4].strip()[5:],
+#             'score': item[5] + item[6]
 #         }
-#     # print(items)
+
 
 # def write_to_file(content):
-#     with open('maoyanfile.txt','a', encoding='utf-8') as f:
-#         print(type(json.dumps(content)))
-#         f.write(json.dumps(content, ensure_ascii=False)+'\n')
+#     with open('result.txt', 'a', encoding='utf-8') as f:
+#         f.write(json.dumps(content, ensure_ascii=False) + '\n')
+
 
 # def main(offset):
-#     # for i in range(10):
-#         # url = 'http://maoyan.com/board/4?offset=' + str(i*10)
 #     url = 'http://maoyan.com/board/4?offset=' + str(offset)
 #     html = get_one_page(url)
-#     # 访问多了需要验证，可以保存了读取
-#     # with open('maoyan.html','r')as f:
-#     #     html = f.read()
-#     print(html)
-#     print("begin parse")
 #     for item in parse_one_page(html):
 #         print(item)
 #         write_to_file(item)
 
-# if __name__ =="__main__":
+
+# if __name__ == '__main__':
 #     for i in range(10):
-#         offset = i * 10
-#         main(offset)
-#         time.sleep(1)
+#         main(offset=i * 10)
+#         time.sleep(10)
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 第4章  解析库的使用
@@ -643,25 +926,24 @@ print(response.read().decode('utf-8'))
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 
-html= """
-<html><head><title>The Dormouse's story</title></head>
-<body>
-<p class="title" name="Dormouse"><b>The Dormouse's story</b></p>
-<p class="story">Once upon a time there were three little sisters; and their were 
-<a herf="http://example.com/elsie" class="sister" id="link1"><!-- Elsie --></a>,
-<a herf="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
-<a herf="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
-and they lived at the bottom of a well.</p>
-<p class="story">...</p>
-"""
-import re
-from bs4 import BeautifulSoup
-soup = BeautifulSoup(html, 'lxml')    # 使用lxml解析库
-
+# html = """
+# <html><head><title>The Dormouse's story</title></head>
+# <body>
+# <p class="title" name="dromouse"><b>The Dormouse's story</b></p>
+# <p class="story">Once upon a time there were three little sisters; and their names were
+# <a href="http://example.com/elsie" class="sister" id="link1"><!-- Elsie --></a>,
+# <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+# <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+# and they lived at the bottom of a well.</p>
+# <p class="story">...</p>
+# """
+# from bs4 import BeautifulSoup
+# soup = BeautifulSoup(html, 'lxml')
 # 以标准的缩进格式输出
 # print(soup.prettify())
 # 提取title节点的文本内容
 # print(soup.title.string)
+# print(soup.title)
 # print(soup.head)
 # print(soup.a.string)
 # print(soup.a.name)
@@ -724,10 +1006,74 @@ soup = BeautifulSoup(html, 'lxml')    # 使用lxml解析库
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 4.3 使用pyquery  CSS选择器的功能比较强大
 # 功能类似 bs4，先不研究了
+# html = '''
+# <div>
+#     <ul>
+#          <li class="item-0">first item</li>
+#          <li class="item-1"><a href="link2.html">second item</a></li>
+#          <li class="item-0 active"><a href="link3.html"><span class="bold">third item</span></a></li>
+#          <li class="item-1 active"><a href="link4.html">fourth item</a></li>
+#          <li class="item-0"><a href="link5.html">fifth item</a></li>
+#      </ul>
+#  </div>
+# '''
+# from pyquery import PyQuery as pq
+# doc = pq(html)
+# print(doc('li'))
+
+# from pyquery import PyQuery as pq
+# # doc = pq(url='http://cuiqingcai.com')
+# doc = pq(filename = 'index.html')
+# print(doc('title'))
+
+
+html = '''
+<div id="container">
+    <ul class="list">
+         <li class="item-0">first item</li>
+         <li class="item-1"><a href="link2.html">second item</a></li>
+         <li class="item-0 active"><a href="link3.html"><span class="bold">third item</span></a></li>
+         <li class="item-1 active"><a href="link4.html">fourth item</a></li>
+         <li class="item-0"><a href="link5.html">fifth item</a></li>
+     </ul>
+ </div>
+'''
+# from pyquery import PyQuery as pq
+# doc = pq(html)
+# # 先选取id为container的节点，然后再选取内部的class为list的节点内部的所有li节点
+# print(doc('#container .list li'))
+# print(type(doc('#container .list li')))
+
+# from pyquery import PyQuery as pq
+# doc = pq(html)
+# items = doc('.list')
+# print(type(items))
+# print(items)
+# lis = items.find('li')
+# print(type(lis))
+# print(lis)
 
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 文件存储
 ## 方法有write txt json csv
+import requests 
+from pyquery import PyQuery as pq 
+url  =  'https://www.zhihu.com/explore'
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
+}
+html=  requests.get(url, headers=headers).text 
+doc =  pq(html) 
+items=  doc('.explore-tab  .feed-item').items() 
+for item in items: 
+    question =  item.find ('h2').text()
+    author  = item.find('.author-link-line').text() 
+    answer=  pq(item .find ('.content').html()).text() 
+    file  = open('explore.txt', 'a', encoding = 'utf-8')
+    file.write('\n'.join([question, author, answer])) 
+    file.write('\n'+ '='* 50 +'\n') 
+    file.close()
+
 # import csv
 
 # with open('data.csv', 'w')as f:

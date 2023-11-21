@@ -90,5 +90,8 @@
 8. 安装数据库
    apt-get install -y mysql-server mysql-client
 
+9. 安装python包
+    pip install tronado flask redis pymysql pymongo pyspider
+
 
 
