@@ -1056,23 +1056,23 @@ html = '''
 ##    ----------------------------------------- splite line -----------------------------------------       ##
 ## 文件存储
 ## 方法有write txt json csv
-import requests 
-from pyquery import PyQuery as pq 
-url  =  'https://www.zhihu.com/explore'
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
-}
-html=  requests.get(url, headers=headers).text 
-doc =  pq(html) 
-items=  doc('.explore-tab  .feed-item').items() 
-for item in items: 
-    question =  item.find ('h2').text()
-    author  = item.find('.author-link-line').text() 
-    answer=  pq(item .find ('.content').html()).text() 
-    file  = open('explore.txt', 'a', encoding = 'utf-8')
-    file.write('\n'.join([question, author, answer])) 
-    file.write('\n'+ '='* 50 +'\n') 
-    file.close()
+# import requests 
+# from pyquery import PyQuery as pq 
+# url  =  'https://www.zhihu.com/explore'
+# headers = {
+#     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2473.116 Safari/537.36'
+# }
+# html=  requests.get(url, headers=headers).text 
+# doc =  pq(html) 
+# items=  doc('.explore-tab  .feed-item').items() 
+# for item in items: 
+#     question =  item.find ('h2').text()
+#     author  = item.find('.author-link-line').text() 
+#     answer=  pq(item .find ('.content').html()).text() 
+#     file  = open('explore.txt', 'a', encoding = 'utf-8')
+#     file.write('\n'.join([question, author, answer])) 
+#     file.write('\n'+ '='* 50 +'\n') 
+#     file.close()
 
 # import csv
 
@@ -1393,7 +1393,7 @@ for item in items:
 ### 5.3.2 Redis存储
 # from redis import StrictRedis
 
-# redis = StrictRedis(host='localhost', port=6379)
+# redis = StrictRedis(host='localhost',password='123456', port=6379)
 # redis.set('name', 'Bob')
 
 # print(redis.get('name'))
@@ -1471,3 +1471,153 @@ for item in items:
 #     'Referer':'https://m.weibo.cn/u/',
     
 # }
+
+
+# import pymongo
+# from selenium import webdriver
+# from selenium.common.exceptions import TimeoutException
+# from selenium.webdriver.common.by import By
+# from selenium.webdriver.support import expected_conditions as EC
+# from selenium.webdriver.support.wait import WebDriverWait
+# from pyquery import PyQuery as pq
+# from config import *
+# from urllib.parse import quote
+
+# # browser = webdriver.Chrome()
+# browser = webdriver.PhantomJS()
+
+# # chrome_options = webdriver.ChromeOptions()
+# # chrome_options.add_argument('--headless')
+# # browser = webdriver.Chrome(chrome_options=chrome_options)
+
+# wait = WebDriverWait(browser, 10)
+# client = pymongo.MongoClient(MONGO_URL)
+# db = client[MONGO_DB]
+
+
+# def index_page(page):
+#     """
+#     抓取索引页
+#     :param page: 页码
+#     """
+#     print('正在爬取第', page, '页')
+#     try:
+#         url = 'https://s.taobao.com/search?q=' + quote(KEYWORD)
+#         browser.get(url)
+#         if page > 1:
+#             input = wait.until(
+#                 EC.presence_of_element_located((By.CSS_SELECTOR, '#mainsrp-pager div.form > input')))
+#             submit = wait.until(
+#                 EC.element_to_be_clickable((By.CSS_SELECTOR, '#mainsrp-pager div.form > span.btn.J_Submit')))
+#             input.clear()
+#             input.send_keys(page)
+#             submit.click()
+#         wait.until(
+#             EC.text_to_be_present_in_element((By.CSS_SELECTOR, '#mainsrp-pager li.item.active > span'), str(page)))
+#         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.m-itemlist .items .item')))
+#         get_products()
+#     except TimeoutException:
+#         index_page(page)
+
+
+# def get_products():
+#     """
+#     提取商品数据
+#     """
+#     html = browser.page_source
+#     doc = pq(html)
+#     items = doc('#mainsrp-itemlist .items .item').items()
+#     for item in items:
+#         product = {
+#             'image': item.find('.pic .img').attr('data-src'),
+#             'price': item.find('.price').text(),
+#             'deal': item.find('.deal-cnt').text(),
+#             'title': item.find('.title').text(),
+#             'shop': item.find('.shop').text(),
+#             'location': item.find('.location').text()
+#         }
+#         print(product)
+#         save_to_mongo(product)
+
+
+# def save_to_mongo(result):
+#     """
+#     保存至MongoDB
+#     :param result: 结果
+#     """
+#     try:
+#         if db[MONGO_COLLECTION].insert(result):
+#             print('存储到MongoDB成功')
+#     except Exception:
+#         print('存储到MongoDB失败')
+
+
+# def main():
+#     """
+#     遍历每一页
+#     """
+#     for i in range(1, MAX_PAGE + 1):
+#         index_page(i)
+#     browser.close()
+
+
+# if __name__ == '__main__':
+#     main()
+
+
+
+import requests
+from lxml import etree
+
+
+class Login(object):
+    def __init__(self):
+        self.headers = {
+            'Referer': 'https://github.com/',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+            'Host': 'github.com'
+        }
+        self.login_url = 'https://github.com/login'
+        self.post_url = 'https://github.com/session'
+        self.logined_url = 'https://github.com/settings/profile'
+        self.session = requests.Session()
+    
+    def token(self):
+        response = self.session.get(self.login_url, headers=self.headers)
+        selector = etree.HTML(response.text)
+        token = selector.xpath('//div/input[2]/@value')
+        return token
+    
+    def login(self, email, password):
+        post_data = {
+            'commit': 'Sign in',
+            'utf8': '✓',
+            'authenticity_token': self.token()[0],
+            'login': email,
+            'password': password
+        }
+        response = self.session.post(self.post_url, data=post_data, headers=self.headers)
+        if response.status_code == 200:
+            self.dynamics(response.text)
+        
+        response = self.session.get(self.logined_url, headers=self.headers)
+        if response.status_code == 200:
+            self.profile(response.text)
+    
+    def dynamics(self, html):
+        selector = etree.HTML(html)
+        dynamics = selector.xpath('//div[contains(@class, "news")]//div[contains(@class, "alert")]')
+        for item in dynamics:
+            dynamic = ' '.join(item.xpath('.//div[@class="title"]//text()')).strip()
+            print(dynamic)
+    
+    def profile(self, html):
+        selector = etree.HTML(html)
+        name = selector.xpath('//input[@id="user_profile_name"]/@value')[0]
+        email = selector.xpath('//select[@id="user_profile_email"]/option[@value!=""]/text()')
+        print(name, email)
+
+
+if __name__ == "__main__":
+    login = Login()
+    login.login(email='cqc@cuiqingcai.com', password='password')
