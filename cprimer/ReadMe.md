@@ -123,7 +123,7 @@ template void Swap<job>(job &, job &);
 # 对象和类
 
 ```c++
-// class定义镭射机，Stock是这个新类的类型名
+// class定义类，Stock是这个新类的类型名
 class Stock {
     // private标识只能通过公共成员访问的类成员
     // private可省略，默认为private
@@ -142,3 +142,9 @@ class Stock {
         void show();
 }
 ```
+
+# 友元
+- 友元函数
+    通过让函数成为类的友元，可以赋予该函数与类的成员相同的访问权限。友元机制允许非成员函数访问私有数据。
+- 友元类
+- 友元成员函数
