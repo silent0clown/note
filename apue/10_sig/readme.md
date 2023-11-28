@@ -3,6 +3,29 @@
 
 在头文件<signal.h>中，信号名都被定义为正整数常量。
 
+
+## 10.9 
+kill函数将信号发送给进程或进程组，raise函数则允许进程向自身发送信号。
+
+```c
+#include<signal.h>
+
+int kill(pid_t pid, int signo);
+
+int raise(int signo);
+
+// 调用raise(signo) == kill(getpid(), signo);
+```
+
+```C
+#include<unistd.h>
+// 设置定时器产生SIGALRM信号
+unsigned int alarm(unsigned int seconds);
+
+// 使调用进程挂起直至捕捉到一个信号
+int pause(void);
+```
+
 - SIGABRT  异常终止（abort）
 - SIGALRM  定时器超时（alarm）
 - SIGBUS   硬件故障
