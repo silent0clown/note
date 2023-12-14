@@ -28,6 +28,10 @@ POSIX线程的功能测试宏是`_POSIX_THREADS`，在编译时确定是否支�
 应用场景：锁被持有的时间短，而且线程不希望在重新调度上花费太多的成本。
 在内核中中断处理程序使用自旋锁，在用户层不是非常有用。
 
+## 11.6.8 屏障
+屏障是用户协调多个线程并行工作的同步机制。允许每个线程等待，直到所有的合作线程都达到某一点，然后从该店继续执行。`pthread_join`就是一种屏障。
+
+
 ```c
 #include <pthread.h>
 /* 线程创建
@@ -45,7 +49,7 @@ void pthread_exit(void *rval_ptr);
 /* 阻塞调用线程，直接接收到指定thread线程的返回值 */
 void pthread_join(pthread_t thread, void **rval_ptr);
 
-/* 请求取消同一进程中的其他线程 */
+/* 请求终止同一进程中的其他线程 */
 int pthread_cancel(pthread_t tid);
 
 /* 线程清理处理程序 */
@@ -116,4 +120,14 @@ int pthread_spin_lock(pthread_spinlock_t *lock);
 int pthread_spin_trylock(pthread_spinlock_t *lock);
 
 int pthread_spin_unlock(pthread_spinlock_t *lock);
+
+// 屏障初始化，设置线程计数count
+int pthread_barrier_init(pthread_barrier_t barrier, 
+                         const pthread_barrierattr_t *restrict attr,
+                         unsigned int count);
+
+int pthread_barrier_destroy(pthread_barrier_t *barrier);
+
+// 调用wait的线程在屏障计数，当满足count时，所有线程都被唤醒
+int pthread_barrier_wait(pthread_barrier_t *barrier);
 ```
