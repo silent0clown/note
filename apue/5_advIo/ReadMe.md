@@ -1,5 +1,6 @@
 # 5 标准I/O函数
 
+<<<<<<< Updated upstream
 ```c
 #include <stdio.h>
 #include <wchar.h>
@@ -80,4 +81,17 @@ scanf()
 fscanf()
 
 sscanf()
+=======
+
+## 5.14 内存流
+
+```c
+#include <stdio.h>
+/* 函数允许调用者提供缓冲区用于内存流
+ * buf 指向缓冲区的开始位置
+ * size 指定缓冲区大小的字节数
+ * type 控制如何使用流 r/rb/w/wb/r+...
+*/
+FILE *fmemopen(void *restrict buf, size_t size, const char * restrict type);
+>>>>>>> Stashed changes
 ```
