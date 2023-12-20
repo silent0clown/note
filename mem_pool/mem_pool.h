@@ -32,6 +32,7 @@ struct mp_large_s {
     void *alloc;//大块内存的起始地址
 };
 
+// 整个内存池的管理结构
 struct mp_pool_s {
     struct mp_large_s *large;
     struct mp_node_s *head;
@@ -52,6 +53,7 @@ void *mp_malloc(struct mp_pool_s *pool, size_t size);
 // 内存申请API
 void *mp_calloc(struct mp_pool_s *pool, size_t size);
 
+// 释放内存API
 void mp_free(struct mp_pool_s *pool, void *p);
 
 void mp_reset_pool(struct mp_pool_s *pool);

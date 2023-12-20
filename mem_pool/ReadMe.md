@@ -14,3 +14,9 @@
 
 初始状态
 ![Alt text](image.png)
+
+分配内存
+![Alt text](image-1.png)
+
+扩容
+![Alt text](image-2.png)
