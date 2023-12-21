@@ -1,0 +1,3 @@
+/mnt/hgfs/note/backend/CMakeFiles/rebuild_cache.dir
+/mnt/hgfs/note/backend/CMakeFiles/demo.dir
+/mnt/hgfs/note/backend/CMakeFiles/edit_cache.dir
