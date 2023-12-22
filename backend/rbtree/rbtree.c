@@ -280,20 +280,20 @@ void rbtree_delete_fixup(rbtree *T, rbtree_node *x) {
         if (x == x->parent->left) {
 
             rbtree_node *w = x->parent->right;   // 兄弟节点
-            if (w->color == RED) {        // 情况2.3.2
+            if (w->color == RED) {        // 情况3.3
                 w->color = BLACK;
                 x->parent->color = RED;  
 
                 rbtree_left_rotate(T, x->parent);
                 w = x->parent->right;
             }
-
+            // 情况3.2
             if ((w->left->color == BLACK) && (w->right->color == BLACK)) {
                 w->color = RED;
                 x = x->parent;
             }
             else {
-
+                // 情况3.5
                 if (w->right->color == BLACK) {
                     w->left->color = BLACK;
                     w->color = RED;
@@ -301,6 +301,7 @@ void rbtree_delete_fixup(rbtree *T, rbtree_node *x) {
                     w = x->parent->right;
                 }
 
+                // 情况3.6
                 w->color = x->parent->color;
                 x->parent->color = BLACK;
                 w->right->color = BLACK;
@@ -350,8 +351,8 @@ void rbtree_delete_fixup(rbtree *T, rbtree_node *x) {
 
 rbtree_node *rbtree_delete(rbtree *T, rbtree_node *z) 
 {
-    rbtree_node *y = T->nil;
-    rbtree_node *x = T->nil;
+    rbtree_node *y = T->nil;      // y --> replace z key
+    rbtree_node *x = T->nil;      // x -- tmp
 
     if ((z->left == T->nil) || (z->right == T->nil)) {
         y = z;
