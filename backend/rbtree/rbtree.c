@@ -385,12 +385,25 @@ rbtree_node *rbtree_delete(rbtree *T, rbtree_node *z)
     return y;
 }
 
-int rbtree_delete_node(rbtree *T, rbtree_node *z) {
-    if (T == NULL || z == NULL) return -1;
+int rbtree_delete_node(rbtree *T, KEY_TYPE key) {
+    if (T == NULL) return -1;
 
-    rbtree_node *tmp = rbtree_delete(T, z);
+    rbtree_node *search_node = T->nil;
+    rbtree_node *tmp = T->nil;
+
+    if (0 != iterative_rbtree_search(T, key, &search_node)) {
+        printf("cant't find key %d in rbtree\n", key);
+        return 1;     
+    }
+
+    tmp = rbtree_delete(T, search_node);
 
     if (tmp != NULL && tmp != T->nil) {
+        // if (tmp == tmp->parent->left) {
+        //     tmp->parent->left = T->nil;
+        // } else {
+        //     tmp->parent->right = T->nil;
+        // }
         free(tmp);
         tmp = NULL;
     }
@@ -402,7 +415,8 @@ int rbtree_destroy(rbtree *T) {
 
     rbtree_node *node = T->root;
     while (node != T->nil) {
-        rbtree_delete_node(T, node);
+        rbtree_delete_node(T, node->key);
+        node = T->root;
     }
     free(T->nil);
     T->nil = NULL;
@@ -433,16 +447,18 @@ int rbtree_search(rbtree *root, KEY_TYPE key) {
     return recursion_search(root, node, key) ? 0 : -1;
 }
 
-int iterative_rbtree_search(rbtree *root, KEY_TYPE key) {
-    if (root == NULL) return -1;
+int iterative_rbtree_search(rbtree *root, KEY_TYPE key, rbtree_node **tmp) {
+    if (root == NULL || tmp == NULL) return -1;
         // return iterative_search(root->root, key) ? 0 : -1;
     rbtree_node *node = root->root;
-    while (node != root->nil && (node->key != key)) {
+    *tmp = root->nil;
+    while (node != root->nil) {
         if (node->key < key) {
             node = node->right;
         } else if (node->key > key) {
             node = node->left;
         } else { // ==
+            *tmp = node;
             return 0;
         }
     }
@@ -517,18 +533,18 @@ int rbtree_insert_node(rbtree *root, KEY_TYPE key) {
 //     }
 // }
 
-void print_rbtree(rbtree *root) {
-    if (root == NULL) return;
+void print_rbtree(rbtree * root, rbtree_node *node) {
+    if (node == NULL) return;
 
-    rbtree_node *node = root->root;
+    // rbtree_node *node = root->root;
     if (node != root->nil) {
 
         printf("%2d(%s) has left child : %d(%s), right child :%d(%s)\n", node->key, rb_is_red(node)?"R":"B", 
                 node->left->key,  rb_is_red(node->left)?"R":"B", node->right->key,  rb_is_red(node->right)?"R":"B");
         // node = node->left;
     }
-    print_rbtree(node->left);
-    print_rbtree(node->right);
+    print_rbtree(root, node->left);
+    print_rbtree(root, node->right);
 
         // rbtree_print(root, root->root->key, 0);
 }
