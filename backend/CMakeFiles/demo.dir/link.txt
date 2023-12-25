@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -std=c99 -g -g -O0   CMakeFiles/demo.dir/rbtree/rbtree_test.c.o CMakeFiles/demo.dir/rbtree/rbtree.c.o  -o demo 

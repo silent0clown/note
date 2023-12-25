@@ -188,7 +188,7 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 CMakeTemplate_BINARY_DIR:STATIC=/mnt/hgfs/note/backend
 
 //Value Computed by CMake
-CMakeTemplate_SOURCE_DIR:STATIC=/mnt/hgfs/note/backend/build
+CMakeTemplate_SOURCE_DIR:STATIC=/mnt/hgfs/note/backend
 
 
 ########################
@@ -269,7 +269,7 @@ CMAKE_GENERATOR_PLATFORM:INTERNAL=
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=/mnt/hgfs/note/backend/build
+CMAKE_HOME_DIRECTORY:INTERNAL=/mnt/hgfs/note/backend
 //Install .so files without execute permission.
 CMAKE_INSTALL_SO_NO_EXE:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER

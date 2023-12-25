@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/hgfs/note/backend/btree/btree.c
+stdio.h
+-
+btree.h
+/mnt/hgfs/note/backend/btree/btree.h
+
+/mnt/hgfs/note/backend/btree/btree.h
+stdio.h
+-
+stdlib.h
+-
+
+/mnt/hgfs/note/backend/btree/btree_test.c
+btree.h
+/mnt/hgfs/note/backend/btree/btree.h
+
+/mnt/hgfs/note/backend/rbtree/rbtree.c
+stdio.h
+-
+stdlib.h
+-
+rbtree.h
+/mnt/hgfs/note/backend/rbtree/rbtree.h
+
+/mnt/hgfs/note/backend/rbtree/rbtree.h
+

@@ -18,6 +18,7 @@ set(PROJECT_BINARY_DIR "${PROJECT_SOURCE_DIR}/build")
 
 # Set build type
 # set(CMAKE_BUILD_TYPE Debug)  # Use `cmake -DCMAKE_BUILD_TYPE=Debug` more better
+set(CMAKE_BUILD_TYPE "${CMAKE_C_FLAGS_DEBUG} -Wall -O0")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Compile options for Debug variant
@@ -25,15 +26,14 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -O0")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 
 # Compile options for Release variant
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+# set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
+# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
 message(STATUS "Compile options for c: ${CMAKE_C_FLAGS}")
 message(STATUS "Compile options for c++: ${CMAKE_CXX_FLAGS}")
 
 ##--------------------- Global Macros --------------------------------------##
 add_definitions(-DDEBUG -DREAL_COOL_ENGINEER)
-
 ##--------------------- Include directories --------------------------------##
 include_directories()
 
@@ -45,6 +45,8 @@ include_directories()
 set(backend_soruce 
     rbtree/rbtree.c
     rbtree/rbtree.h)
+    # btree/btree.c
+    # btree/btree.h)
 
 
 ##--------------------- Build target ---------------------------------------##
@@ -77,7 +79,8 @@ else()
     # DEPENDS math nn)
 endif()
 
-add_executable(demo rbtree/rbtree_test.c ${backend_soruce})
+add_executable(test_rbtree rbtree/rbtree_test.c ${backend_soruce})
+# add_executable(test_btree btree/btree_test.c ${backend_soruce})
 
 
 ##--------------------- Build unit tests -----------------------------------##

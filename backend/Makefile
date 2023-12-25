@@ -48,7 +48,7 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/hgfs/note/backend/build
+CMAKE_SOURCE_DIR = /mnt/hgfs/note/backend
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /mnt/hgfs/note/backend
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named demo
+# Target rules for targets named test_rbtree
 
 # Build rule for target.
-demo: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 demo
-.PHONY : demo
+test_rbtree: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test_rbtree
+.PHONY : test_rbtree
 
 # fast build rule for target.
-demo/fast:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/build
-.PHONY : demo/fast
+test_rbtree/fast:
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/build
+.PHONY : test_rbtree/fast
 
 rbtree/rbtree.o: rbtree/rbtree.c.o
 
@@ -129,7 +129,7 @@ rbtree/rbtree.o: rbtree/rbtree.c.o
 
 # target to build an object file
 rbtree/rbtree.c.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree.c.o
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree.c.o
 .PHONY : rbtree/rbtree.c.o
 
 rbtree/rbtree.i: rbtree/rbtree.c.i
@@ -138,7 +138,7 @@ rbtree/rbtree.i: rbtree/rbtree.c.i
 
 # target to preprocess a source file
 rbtree/rbtree.c.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree.c.i
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree.c.i
 .PHONY : rbtree/rbtree.c.i
 
 rbtree/rbtree.s: rbtree/rbtree.c.s
@@ -147,7 +147,7 @@ rbtree/rbtree.s: rbtree/rbtree.c.s
 
 # target to generate assembly for a file
 rbtree/rbtree.c.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree.c.s
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree.c.s
 .PHONY : rbtree/rbtree.c.s
 
 rbtree/rbtree_test.o: rbtree/rbtree_test.c.o
@@ -156,7 +156,7 @@ rbtree/rbtree_test.o: rbtree/rbtree_test.c.o
 
 # target to build an object file
 rbtree/rbtree_test.c.o:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree_test.c.o
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree_test.c.o
 .PHONY : rbtree/rbtree_test.c.o
 
 rbtree/rbtree_test.i: rbtree/rbtree_test.c.i
@@ -165,7 +165,7 @@ rbtree/rbtree_test.i: rbtree/rbtree_test.c.i
 
 # target to preprocess a source file
 rbtree/rbtree_test.c.i:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree_test.c.i
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree_test.c.i
 .PHONY : rbtree/rbtree_test.c.i
 
 rbtree/rbtree_test.s: rbtree/rbtree_test.c.s
@@ -174,7 +174,7 @@ rbtree/rbtree_test.s: rbtree/rbtree_test.c.s
 
 # target to generate assembly for a file
 rbtree/rbtree_test.c.s:
-	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/rbtree/rbtree_test.c.s
+	$(MAKE) -f CMakeFiles/test_rbtree.dir/build.make CMakeFiles/test_rbtree.dir/rbtree/rbtree_test.c.s
 .PHONY : rbtree/rbtree_test.c.s
 
 # Help Target
@@ -184,7 +184,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... demo"
+	@echo "... test_rbtree"
 	@echo "... edit_cache"
 	@echo "... rbtree/rbtree.o"
 	@echo "... rbtree/rbtree.i"
