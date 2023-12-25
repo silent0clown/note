@@ -18,7 +18,7 @@ set(PROJECT_BINARY_DIR "${PROJECT_SOURCE_DIR}/build")
 
 # Set build type
 # set(CMAKE_BUILD_TYPE Debug)  # Use `cmake -DCMAKE_BUILD_TYPE=Debug` more better
-set(CMAKE_BUILD_TYPE "${CMAKE_C_FLAGS_DEBUG} -Wall -O0")
+set(CMAKE_BUILD_TYPE Debug)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Compile options for Debug variant
@@ -33,7 +33,7 @@ message(STATUS "Compile options for c: ${CMAKE_C_FLAGS}")
 message(STATUS "Compile options for c++: ${CMAKE_CXX_FLAGS}")
 
 ##--------------------- Global Macros --------------------------------------##
-add_definitions(-DDEBUG -DREAL_COOL_ENGINEER)
+# add_definitions(-DDEBUG -DREAL_COOL_ENGINEER)
 ##--------------------- Include directories --------------------------------##
 include_directories()
 
@@ -44,9 +44,9 @@ include_directories()
 ##--------------------- Source files ---------------------------------------##
 set(backend_soruce 
     rbtree/rbtree.c
-    rbtree/rbtree.h)
-    # btree/btree.c
-    # btree/btree.h)
+    rbtree/rbtree.h
+    btree/btree.c
+    btree/btree.h)
 
 
 ##--------------------- Build target ---------------------------------------##
@@ -66,8 +66,8 @@ set(backend_soruce
 #     add_subdirectory(src/c/nn)
 # else()
 #     # Build math lib
-#     add_subdirectory(rbtree)
-#     add_subdirectory(btree)
+    # add_subdirectory(rbtree)
+    # add_subdirectory(btree)
 # endif()
 
 # Merge library
@@ -80,7 +80,7 @@ else()
 endif()
 
 add_executable(test_rbtree rbtree/rbtree_test.c ${backend_soruce})
-# add_executable(test_btree btree/btree_test.c ${backend_soruce})
+add_executable(test_btree btree/btree_test.c ${backend_soruce})
 
 
 ##--------------------- Build unit tests -----------------------------------##

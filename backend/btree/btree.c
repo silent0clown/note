@@ -47,7 +47,7 @@ void btree_split_child(btree *T, btree_node *node, int childPos) {
         node->childrens[j+1] = node->childrens[j];
     }
 
-    node->childrens[order+1] = brother_node;
+    node->childrens[childPos+1] = brother_node;
 
     for (j = node->keynum-1; j >= order; j--) {
         node->keys[j+1] = node->keys[j];
@@ -88,7 +88,7 @@ void btree_insert(btree *T, KEY_TYPE key) {
 
     btree_node *root = T->root;
     if (root->keynum == MAX_KEY_NUM(T->sub_order)) { // need split
-        btree_node *node = btree_create_node(T->sub_order, BTREE_IS_LEAF); // 创建一个父节点
+        btree_node *node = btree_create_node(T->sub_order, BTREE_NO_LEAF); // 创建一个父节点
         T->root = node;
         node->childrens[0] = root;
 

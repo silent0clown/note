@@ -1,1 +1,0 @@
-/usr/bin/cc  -pipe -std=c99   CMakeFiles/test_btree.dir/btree/btree_test.c.o CMakeFiles/test_btree.dir/rbtree/rbtree.c.o CMakeFiles/test_btree.dir/btree/btree.c.o  -o test_btree 
