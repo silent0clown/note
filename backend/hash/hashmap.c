@@ -141,7 +141,7 @@ int main(int argc, char **argv)
    	    HashMap *hashmap=CreateHashMap(nums,6);
     	PrintHashMap(hashmap);
     	//查找元素
-    	// printf("%d\n",Get(*hashmap,78));
+    	printf("%d\n",Get(*hashmap,78));
 
     	DestoryHashMap(hashmap);
     	getchar();

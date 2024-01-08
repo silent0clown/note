@@ -1,0 +1,4 @@
+/mnt/hgfs/note/backend/build/CMakeFiles/rebuild_cache.dir
+/mnt/hgfs/note/backend/build/CMakeFiles/edit_cache.dir
+/mnt/hgfs/note/backend/build/CMakeFiles/test_rbtree.dir
+/mnt/hgfs/note/backend/build/CMakeFiles/test_btree.dir
