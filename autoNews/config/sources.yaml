@@ -1,0 +1,86 @@
+sources:
+  # 今日头条 - 网页爬虫示例
+  - name: "今日头条"
+    enabled: false  # 需要动态内容加载，暂时禁用
+    type: "web"
+    categories:
+      - name: "科技"
+        url: "https://www.toutiao.com/ch/news_tech/"
+        tags: ["科技", "tech"]
+
+  # IT之家 - RSS订阅（科技新闻）
+  - name: "IT之家"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "全部"
+        url: "https://www.ithome.com/rss/"
+        tags: ["科技", "IT"]
+
+  # 36氪 - RSS订阅（创业科技）
+  - name: "36氪"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "快讯"
+        url: "https://www.36kr.com/feed-article"
+        tags: ["科技", "创业"]
+    config:
+      # 36氪需要更真实的浏览器头
+      user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      headers:
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        Accept-Language: "zh-CN,zh;q=0.9,en;q=0.8"
+        Accept-Encoding: "gzip, deflate, br"
+        Referer: "https://www.36kr.com/"
+        DNT: "1"
+      timeout: 20
+
+  # Solidot - RSS订阅（科技资讯）
+  - name: "Solidot"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "全部"
+        url: "https://www.solidot.org/index.rss"
+        tags: ["科技", "开源"]
+
+  # V2EX - RSS订阅（技术社区）
+  - name: "V2EX"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "最新主题"
+        url: "https://www.v2ex.com/index.xml"
+        tags: ["技术", "社区"]
+
+  # HackerNews中文 - RSS
+  - name: "HackerNews"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "Top"
+        url: "https://hnrss.org/frontpage"
+        tags: ["tech", "international"]
+
+  # 网页爬虫模板 - 可以根据需要启用和配置
+  # - name: "自定义网站"
+  #   enabled: false
+  #   type: "web"
+  #   categories:
+  #     - name: "分类名"
+  #       url: "https://example.com"
+  #       tags: ["tag1", "tag2"]
+  #       selectors:
+  #         article: "div.article-list li"   # 文章列表项
+  #         title: "h2.title"                # 标题选择器
+  #         link: "a"                        # 链接选择器
+  #         date: "span.date"                # 日期选择器（可选）
+  #         summary: "p.desc"                # 摘要选择器（可选）
+
+fetch_settings:
+  timeout: 15  # 超时时间（秒）
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  max_articles_per_source: 10  # 每个源只抓取10篇文章
+  include_content: true  # 获取完整文章内容
+  respect_robots_txt: true

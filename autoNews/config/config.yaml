@@ -1,0 +1,47 @@
+app:
+  name: "AutoNews"
+  timezone: "UTC"
+
+scheduler:
+  enabled: true
+  cron: "0 8 * * *"  # Every day at 8:00 AM
+
+storage:
+  type: "json"  # Main storage format
+  output_dir: "data/processed"
+  exports_dir: "data/exports"
+  organize_by_date: true
+  formats:
+    - json
+    - markdown
+
+processing:
+  deduplication:
+    enabled: true
+    history_file: "data/history/hashes.json"
+    method: "content_hash"
+
+  summarization:
+    enabled: true
+    max_length: 200
+    method: "extractive"
+
+  classification:
+    enabled: true
+    method: "keyword"
+
+notifications:
+  enabled: true
+  channels:
+    - type: "console"
+
+logging:
+  level: "INFO"
+  file: "logs/autonews.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+error_handling:
+  max_retries: 3
+  retry_delay: 5
+  continue_on_error: true

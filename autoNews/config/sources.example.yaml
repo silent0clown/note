@@ -1,0 +1,284 @@
+# AutoNews 新闻源配置示例
+# 展示各种认证、代理、Cookie配置方式
+
+sources:
+  # ============================================================
+  # 示例1: 基本RSS订阅（无需认证）
+  # ============================================================
+  - name: "IT之家"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "全部"
+        url: "https://www.ithome.com/rss/"
+        tags: ["科技", "IT"]
+
+  # ============================================================
+  # 示例2: 需要自定义User-Agent和Headers的网站
+  # ============================================================
+  - name: "36氪"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "快讯"
+        url: "https://www.36kr.com/feed-article"
+        tags: ["科技", "创业"]
+    # 网站级别的配置
+    config:
+      user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+      headers:
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        Accept-Language: "zh-CN,zh;q=0.9,en;q=0.8"
+        Referer: "https://www.36kr.com/"
+      verify_ssl: true  # 是否验证SSL证书
+
+  # ============================================================
+  # 示例3: 使用HTTP代理的网站（翻墙访问）
+  # ============================================================
+  - name: "HackerNews"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "Top"
+        url: "https://hnrss.org/frontpage"
+        tags: ["tech", "international"]
+    config:
+      proxy:
+        http: "http://127.0.0.1:7890"   # HTTP代理
+        https: "http://127.0.0.1:7890"  # HTTPS代理
+        # 或使用SOCKS代理
+        # http: "socks5://127.0.0.1:1080"
+        # https: "socks5://127.0.0.1:1080"
+
+  # ============================================================
+  # 示例4: 使用Cookie的网站（手动配置Cookie）
+  # ============================================================
+  - name: "付费媒体示例"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "科技"
+        url: "https://example.com/rss"
+        tags: ["科技"]
+    config:
+      cookies:
+        session_id: "your_session_id_here"
+        user_token: "your_token_here"
+        # 或从文件加载
+        # cookies: "auto"  # 自动从 data/cookies/付费媒体示例.json 加载
+        # cookies: "/path/to/cookies.json"  # 从指定文件加载
+
+  # ============================================================
+  # 示例5: HTTP Basic认证
+  # ============================================================
+  - name: "需要Basic认证的网站"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "全部"
+        url: "https://example.com/feed"
+        tags: ["tech"]
+    config:
+      auth:
+        type: "basic"
+        username: "your_username"
+        password: "your_password"
+
+  # ============================================================
+  # 示例6: Bearer Token认证（API Token）
+  # ============================================================
+  - name: "需要Token的API"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "文章"
+        url: "https://api.example.com/articles/feed"
+        tags: ["tech"]
+    config:
+      auth:
+        type: "bearer"  # 或 "token"
+        token: "your_api_token_here"
+
+  # ============================================================
+  # 示例7: API Key认证
+  # ============================================================
+  - name: "需要API Key的服务"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "新闻"
+        url: "https://api.example.com/news"
+        tags: ["news"]
+    config:
+      auth:
+        type: "api_key"
+        api_key: "your_api_key_here"
+        key_name: "X-API-Key"  # 默认为 "X-API-Key"，可自定义
+
+  # ============================================================
+  # 示例8: Session-based认证（需要登录的网站）
+  # ============================================================
+  - name: "需要登录的网站"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "订阅内容"
+        url: "https://example.com/feed"
+        tags: ["premium"]
+    config:
+      auth:
+        type: "session"
+        login_url: "https://example.com/login"
+        username: "your_username"
+        password: "your_password"
+        username_field: "email"      # 登录表单的用户名字段名（默认: username）
+        password_field: "password"   # 登录表单的密码字段名（默认: password）
+        login_data:                  # 额外的登录表单数据
+          remember_me: "1"
+          csrf_token: "xxx"
+      cookies: "auto"  # 登录后自动保存Cookie到文件
+
+  # ============================================================
+  # 示例9: 自定义认证头（Custom Headers）
+  # ============================================================
+  - name: "自定义认证"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "文章"
+        url: "https://example.com/feed"
+        tags: ["tech"]
+    config:
+      auth:
+        type: "custom"
+        headers:
+          Authorization: "Custom your_custom_auth_string"
+          X-Custom-Header: "custom_value"
+
+  # ============================================================
+  # 示例10: 完整配置示例（组合多种功能）
+  # ============================================================
+  - name: "复杂网站完整示例"
+    enabled: false
+    type: "rss"
+    categories:
+      - name: "科技新闻"
+        url: "https://example.com/tech/rss"
+        tags: ["科技", "深度"]
+    config:
+      # User-Agent
+      user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+      # 代理
+      proxy:
+        http: "http://127.0.0.1:7890"
+        https: "http://127.0.0.1:7890"
+
+      # 自定义请求头
+      headers:
+        Accept: "text/html,application/xhtml+xml"
+        Accept-Language: "zh-CN,zh;q=0.9"
+        Referer: "https://example.com/"
+        DNT: "1"
+
+      # 认证
+      auth:
+        type: "session"
+        login_url: "https://example.com/api/login"
+        username: "user@example.com"
+        password: "password123"
+        username_field: "email"
+
+      # Cookie管理
+      cookies: "auto"  # 自动加载和保存
+
+      # SSL验证
+      verify_ssl: false  # 如果网站证书有问题可设为false
+
+      # 超时
+      timeout: 30
+
+  # ============================================================
+  # 默认启用的源
+  # ============================================================
+  - name: "Solidot"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "全部"
+        url: "https://www.solidot.org/index.rss"
+        tags: ["科技", "开源"]
+
+  - name: "V2EX"
+    enabled: true
+    type: "rss"
+    categories:
+      - name: "最新主题"
+        url: "https://www.v2ex.com/index.xml"
+        tags: ["技术", "社区"]
+
+# ============================================================
+# 全局抓取设置
+# ============================================================
+fetch_settings:
+  timeout: 15  # 默认超时时间（秒），可被源配置覆盖
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  max_articles_per_source: 10  # 每个源最多抓取文章数
+  include_content: true  # 是否获取完整文章内容
+  respect_robots_txt: true  # 是否遵守robots.txt
+
+  # 全局代理（可被源配置覆盖）
+  # proxy:
+  #   http: "http://127.0.0.1:7890"
+  #   https: "http://127.0.0.1:7890"
+
+  # 全局请求头（可被源配置覆盖）
+  # headers:
+  #   Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+  #   Accept-Language: "zh-CN,zh;q=0.9,en;q=0.8"
+
+# ============================================================
+# Cookie管理说明
+# ============================================================
+# Cookie有三种配置方式：
+#
+# 1. 手动配置Cookie字典:
+#    cookies:
+#      session_id: "abc123"
+#      user_token: "xyz789"
+#
+# 2. 自动管理Cookie文件:
+#    cookies: "auto"
+#    # 会从 data/cookies/{源名称}.json 加载和保存
+#
+# 3. 指定Cookie文件路径:
+#    cookies: "/path/to/cookies.json"
+#
+# Cookie文件格式 (JSON):
+# {
+#   "session_id": "value1",
+#   "user_token": "value2"
+# }
+
+# ============================================================
+# 代理配置说明
+# ============================================================
+# 支持的代理格式:
+# - HTTP代理: http://host:port
+# - HTTPS代理: https://host:port
+# - SOCKS5代理: socks5://host:port
+# - 带认证的代理: http://user:pass@host:port
+#
+# 常见代理端口:
+# - Clash: 7890
+# - V2Ray: 1080
+# - SS: 1080
+
+# ============================================================
+# 认证类型说明
+# ============================================================
+# 1. basic: HTTP Basic认证
+# 2. bearer/token: Bearer Token认证
+# 3. api_key: API Key认证
+# 4. session: 需要登录的Session认证
+# 5. custom: 自定义认证头
